@@ -1,5 +1,5 @@
 // Replace 12345 with the correct team number and then uncomment the line below.
-// #define TEAM_NUMBER 12345
+#define TEAM_NUMBER 26
 
 #ifndef TEAM_NUMBER
 #error "Define your team number with `#define TEAM_NUMBER 12345` at the top of the file."
@@ -13,8 +13,20 @@ void setup()
 }
 
 int temp = 0;
+int autonTime = 0;
+int delayTime = 20;
 
-void loop()
+void auton()
+{
+  int sensors[6];
+
+  RR_getLineSensors(sensors);
+
+
+
+}
+
+void teleopRead()
 {
   // Read the four joystick axes
   // These will be in the range [-1.0, 1.0]
@@ -36,6 +48,7 @@ void loop()
   bool btnY = RR_buttonY();
   bool btnRB = RR_buttonRB();
   bool btnLB = RR_buttonLB();
+
 
   // Control motor3 port (unused on base robot) using A/B buttons
   if (btnA)
@@ -71,16 +84,14 @@ void loop()
   { // left
 
     // we can't move a servo less than 0 degrees
-    if (temp > 0)
-      temp -= 10;
+    drive(10,0)
   }
   else if (RR_dpad() == 2)
   { // right
 
-    // we can't move a servo past 180 degrees
-    // for continuous rotation, try using a DC motor
-    if (temp < 180)
-      temp += 10;
+
+    drive(0,10)
+    
   }
   RR_setServo1(temp);
 
@@ -99,7 +110,24 @@ void loop()
   }
 
   // we also have RR_setServo3 and RR_setServo4 available
+}
 
+
+void drive(int l, int r){
+      // we can't move a servo less than 0 degrees
+
+  if (temp > 0)
+      temp -= l;
+
+      // we can't move a servo past 180 degrees
+  // for continuous rotation, try using a DC motor
+  if (temp < 180)
+      temp += r;
+}
+
+void loop()
+{
+  teleopRead();
   // read the ultrasonic sensors
 
   Serial.print("Ultrasonic=");
@@ -120,9 +148,11 @@ void loop()
   Serial.print(btnY ? 1 : 0);
   Serial.println();
 
-  // This is important - it sleeps for 0.02 seconds (= 50 times / second)
+  auton();
+  // This is important - it sleeps for delayTime/100 seconds
   // Running the code too fast will overwhelm the microcontroller and peripherals
-  delay(20);
+  delay(delayTime);
+  autonTime += delayTime;
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab
