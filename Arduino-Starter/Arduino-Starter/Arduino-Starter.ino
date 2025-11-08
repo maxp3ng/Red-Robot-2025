@@ -27,9 +27,9 @@ float pos, lastPos, error, lastError;
 float p,i,d;
 
 //tweak implement gains!
-float Kp = 10;
-float Ki = 10;
-float Kd = (Kp-1)*10;
+float Kp = 5;
+float Ki = 0;
+float Kd = 0;
 
 void autonDrive(int angle){
   drive(0-angle, angle);
@@ -38,8 +38,8 @@ void autonDrive(int angle){
 void auton()
 {
   if (btnB) {autonGo = true;}
-  if (!autonGo) {return;}
-  int nSense = 6;
+  //if (!autonGo) {return;}
+  int nSense = 4;
   float nSenseAv = (float)(nSense-1)/2.0;
   int sensors[nSense];
   float mean;
@@ -50,30 +50,44 @@ void auton()
   for (int i = 0; i < nSense; ++i)
   {
     // TODO tweak offset based weighting 
-    sum += sensors[i]*(i-nSense);
+    sum += sensors[i]*(i-nSenseAv);
 
     Serial.print(sensors[i]);
     Serial.print(" ");
   }
-  mean = sum /= nSense;
+  mean = sum / nSense;
 
-  pos = mean/sum;
+  pos = mean;
   error = pos-nSenseAv;
 
   // we love PID!
   p = error;
-  i += error;
+
+  if (i+error>100) {i=100;}
+  else if (i+error<-100) {i=-100;}
+  else {i += error;} 
   d = error - lastError;
   
   lastPos = pos;
   lastError = error;
   //pid is a value from 0-5 ctn
   int pid = (Kp*p + Ki*i + Kd*d);
-  autonDrive(pid/nSenseAv);
+  float turn = pid/nSenseAv;
+  if (turn > 1.0) turn=1.0;
+  if (turn < -1.0) turn=-1.0;
+  autonDrive(turn);
 
-  Serial.print("Pos: "); Serial.print(pos);
-  Serial.print(" Error: "); Serial.print(error);
-  Serial.print(" PID: "); Serial.print(pid);
+  Serial.println();
+
+  Serial.print("p: "); Serial.println(p);
+  Serial.print("i: "); Serial.println(i);
+  Serial.print("d: "); Serial.println(d);
+  Serial.print("mean : "); Serial.println(mean);
+  Serial.print("sum: "); Serial.println(sum);
+  Serial.print("Pos: "); Serial.println(pos);
+  Serial.print(" Error: "); Serial.println(error);
+  Serial.print(" PID: "); Serial.println(pid);
+  Serial.print(" turn: "); Serial.println(turn);
 }
 
 void teleopRead() {
