@@ -19,12 +19,57 @@ int delayTime = 20;
 float rightX,rightY,leftX,leftY;
 bool btnA,btnB,btnX,btnY,btnRB,btnLB;
 
+
+//auton globals
+bool autonGo = false;
+
+float pos, lastPos, error, lastError;
+float p,i,d;
+
+//tweak implement gains!
+float Kp = 10;
+float Ki = 10;
+float Kd = (Kp-1)*10;
+
+void autonDrive(int angle){
+  drive(0-angle, angle);
+}
+
 void auton()
 {
-  int sensors[6];
-
+  if (btnB) {autonGo = true;}
+  if (!autonGo) {return;}
+  int nSense;
+  float nSenseAv = (float)nSense/2;
+  int sensors[nSense];
+  float mean;
+  float sum = 0.0;
+  
+  Serial.print("Line sensors =");
   RR_getLineSensors(sensors);
+  for (int i = 0; i < nSense; ++i)
+  {
+    // TODO tweak offset based weighting 
+    sum += sensors[i]*abs(nSenseAv-i);
 
+    Serial.print(sensors[i]);
+    Serial.print(" ");
+  }
+  mean = sum /= nSense;
+
+  pos = mean/sum;
+  error = pos-lastPos;
+
+  // we love PID!
+  p = error;
+  i += error;
+  d = lastError;
+  
+  lastPos = pos;
+  lastError = error;
+  //pid is a value from 0-5 ctn
+  int pid = (Kp*p + Kp*i + Kp*d);
+  autonDrive((pid-nSenseAv)/nSenseAv);
 }
 
 void teleopRead() {
@@ -55,8 +100,6 @@ void drive(int l, int r) {
   RR_setMotor2(r);
 }
 
-
-
 void controlServo1(int l, int r){
       // we can't move a servo less than 0 degrees
 
@@ -77,6 +120,7 @@ void printUltrasonic() {
 
 void printButtons() {
   Serial.print(btnA ? 1 : 0);
+  //auton button is B
   Serial.print(btnB ? 1 : 0);
   Serial.print(btnX ? 1 : 0);
   Serial.print(btnY ? 1 : 0);
@@ -90,22 +134,14 @@ void loop()
   drive(leftY+rightX,leftY-rightX);
 
   if (btnRB) {
-    alignToBall(true)
+    alignToBall(true);
   } else if (btnLB) {
-    alignToBall(false)
+    alignToBall(false);
   }
 
-  int sensors[6];
-
-  Serial.print("Line sensors=");
-  RR_getLineSensors(sensors);
-  for (int i = 0; i < 6; ++i)
-  {
-    Serial.print(sensors[i]);
-    Serial.print(" ");
-  }
 
   auton();
+
   // This is important - it sleeps for delayTime/100 seconds
   // Running the code too fast will overwhelm the microcontroller and peripherals
   delay(delayTime);
