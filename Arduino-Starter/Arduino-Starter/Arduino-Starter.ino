@@ -27,12 +27,12 @@ float pos, lastPos, error, lastError;
 float p,i,d;
 
 //tweak implement gains!
-float Kp = 5;
+float Kp = 1.0;
 float Ki = 0;
 float Kd = 0;
 
 void autonDrive(int angle){
-  drive(0-angle, angle);
+  drive(0.0-angle, angle);
 }
 
 void auton()
@@ -70,12 +70,12 @@ void auton()
   
   lastPos = pos;
   lastError = error;
-  //pid is a value from 0-5 ctn
   int pid = (Kp*p + Ki*i + Kd*d);
-  float turn = pid/nSenseAv;
-  if (turn > 1.0) turn=1.0;
-  if (turn < -1.0) turn=-1.0;
+  float maxPID = 5000;
+  float turn = pid/maxPID;
+  turn = constrain(turn, -1.0, 1.0);
   autonDrive(turn);
+
 
   Serial.println();
 
@@ -88,6 +88,7 @@ void auton()
   Serial.print(" Error: "); Serial.println(error);
   Serial.print(" PID: "); Serial.println(pid);
   Serial.print(" turn: "); Serial.println(turn);
+  
 }
 
 void teleopRead() {
@@ -119,9 +120,14 @@ void alignToBall(bool dir){
   }
 }
 
-void drive(int l, int r) {
+void drive(float l, float r) {
+  Serial.println();
+
+  Serial.print("l: "); Serial.println(l);
+  Serial.print("r: "); Serial.println(-1*r);
+
   RR_setMotor1(l);
-  RR_setMotor2(r);
+  RR_setMotor2(-1*r);
 }
 
 void controlServo1(int l, int r){
@@ -153,7 +159,7 @@ void printButtons() {
 
 void loop()
 {
-  //teleopRead();
+  teleopRead();
   // read the ultrasonic sensors
   //if (btnRB) {
   //  alignToBall(true);
@@ -170,10 +176,10 @@ void loop()
   //   Serial.print(sensors[i]);
   //   Serial.print(" ");
   // }
-  int angle = 1;
-  drive(0-angle, angle);
+  //int angle = 1;
+  //drive(0-angle, angle);
 
-  //auton();
+  auton();
 
   // This is important - it sleeps for delayTime/100 seconds
   // Running the code too fast will overwhelm the microcontroller and peripherals
