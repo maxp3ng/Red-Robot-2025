@@ -39,7 +39,7 @@ void autonDrive(float angle){
 void auton()
 {
   if (btnB) {autonGo = true;}
-  //if (!autonGo) {return;}
+  if (!autonGo) {return;}
   int nSense = 4;
   float nSenseAv = (float)(nSense-1)/2.0;
   int sensors[nSense];
