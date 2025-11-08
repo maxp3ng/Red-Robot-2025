@@ -38,7 +38,7 @@ void autonDrive(int angle){
 void auton()
 {
   if (btnB) {autonGo = true;}
-  //if (!autonGo) {return;}
+  if (!autonGo) {return;}
   int nSense = 4;
   float nSenseAv = (float)(nSense-1)/2.0;
   int sensors[nSense];
@@ -124,10 +124,10 @@ void drive(float l, float r) {
   Serial.println();
 
   Serial.print("l: "); Serial.println(l);
-  Serial.print("r: "); Serial.println(-1*r);
+  Serial.print("r: "); Serial.println(-1.0*r);
 
   RR_setMotor1(l);
-  RR_setMotor2(-1*r);
+  RR_setMotor2(-1.0*r);
 }
 
 void controlServo1(int l, int r){
