@@ -51,8 +51,8 @@ void alignToBall(bool dir){
 }
 
 void drive(int l, int r) {
-  RR_setMotor1(leftY + rightX);
-  RR_setMotor2(leftY - rightX);
+  RR_setMotor1(l);
+  RR_setMotor2(r);
 }
 
 
@@ -73,6 +73,14 @@ void printUltrasonic() {
   Serial.print("Ultrasonic=");
   Serial.print(RR_getUltrasonic());
   Serial.print(" ;; ");
+}
+
+void printButtons() {
+  Serial.print(btnA ? 1 : 0);
+  Serial.print(btnB ? 1 : 0);
+  Serial.print(btnX ? 1 : 0);
+  Serial.print(btnY ? 1 : 0);
+  Serial.println();
 }
 
 void loop()
@@ -96,11 +104,6 @@ void loop()
     Serial.print(sensors[i]);
     Serial.print(" ");
   }
-  Serial.print(btnA ? 1 : 0);
-  Serial.print(btnB ? 1 : 0);
-  Serial.print(btnX ? 1 : 0);
-  Serial.print(btnY ? 1 : 0);
-  Serial.println();
 
   auton();
   // This is important - it sleeps for delayTime/100 seconds
