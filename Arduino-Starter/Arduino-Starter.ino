@@ -16,104 +16,48 @@ int temp = 0;
 int autonTime = 0;
 int delayTime = 20;
 
+float rightX,rightY,leftX,leftY;
+bool btnA,btnB,btnX,btnY,btnRB,btnLB;
+
 void auton()
 {
   int sensors[6];
 
   RR_getLineSensors(sensors);
 
-
-
 }
 
-void teleopRead()
-{
-  // Read the four joystick axes
-  // These will be in the range [-1.0, 1.0]
-  float rightX = RR_axisRX();
-  float rightY = RR_axisRY();
-  float leftX = RR_axisLX();
-  float leftY = RR_axisLY();
+void teleopRead() {
+  rightX = RR_axisRX();
+  rightY = RR_axisRY();
+  leftX = RR_axisLX();
+  leftY = RR_axisLY();
+  btnA = RR_buttonA();
+  btnB = RR_buttonB();
+  btnX = RR_buttonX();
+  btnY = RR_buttonY();
+  btnRB = RR_buttonRB();
+  btnLB = RR_buttonLB();
+}
 
-  // Arcade-drive scheme
-  // Left Y-axis = throttle
-  // Right X-axis = steering
+void alignToBall(bool dir){
+  //Rotate left
+  if(dir==true){
+    
+  } else {
+  //Rotate right
+  
+  }
+}
+
+void drive(int l, int r) {
   RR_setMotor1(leftY + rightX);
   RR_setMotor2(leftY - rightX);
-
-  // Get the button states
-  bool btnA = RR_buttonA();
-  bool btnB = RR_buttonB();
-  bool btnX = RR_buttonX();
-  bool btnY = RR_buttonY();
-  bool btnRB = RR_buttonRB();
-  bool btnLB = RR_buttonLB();
-
-
-  // Control motor3 port (unused on base robot) using A/B buttons
-  if (btnA)
-  {
-    RR_setMotor3(1.0);
-  }
-  else if (btnB)
-  {
-    RR_setMotor3(-1.0);
-  }
-  else
-  {
-    RR_setMotor3(0.0);
-  }
-
-  // Control motor4 port (unused on base robot) using X/Y buttons
-  if (btnX)
-  {
-    RR_setMotor4(1.0);
-  }
-  else if (btnY)
-  {
-    RR_setMotor4(-1.0);
-  }
-  else
-  {
-    RR_setMotor4(0.0);
-  }
-
-  // Control servo 1 using the dpad
-  // 6 = left, 2 = right, 0 = up, 4 = down, 8 = center
-  if (RR_dpad() == 6)
-  { // left
-
-    // we can't move a servo less than 0 degrees
-    drive(10,0)
-  }
-  else if (RR_dpad() == 2)
-  { // right
-
-
-    drive(0,10)
-    
-  }
-  RR_setServo1(temp);
-
-  // Control servo 2 using the shoulder buttons
-  // This example moves the servo to fixed points
-  // You can change the angles based on your mechanism
-  // (this is great for a mechanism that only has 2 states,
-  //  such as a grabber or hook)
-  if (btnRB)
-  {
-    RR_setServo2(180);
-  }
-  else if (btnLB)
-  {
-    RR_setServo2(0);
-  }
-
-  // we also have RR_setServo3 and RR_setServo4 available
 }
 
 
-void drive(int l, int r){
+
+void controlServo1(int l, int r){
       // we can't move a servo less than 0 degrees
 
   if (temp > 0)
@@ -125,14 +69,24 @@ void drive(int l, int r){
       temp += r;
 }
 
+void printUltrasonic() {
+  Serial.print("Ultrasonic=");
+  Serial.print(RR_getUltrasonic());
+  Serial.print(" ;; ");
+}
+
 void loop()
 {
   teleopRead();
   // read the ultrasonic sensors
+  drive(leftY+rightX,leftY-rightX);
 
-  Serial.print("Ultrasonic=");
-  Serial.print(RR_getUltrasonic());
-  Serial.print(" ;; ");
+  if (btnRB) {
+    alignToBall(true)
+  } else if (btnLB) {
+    alignToBall(false)
+  }
+
   int sensors[6];
 
   Serial.print("Line sensors=");
