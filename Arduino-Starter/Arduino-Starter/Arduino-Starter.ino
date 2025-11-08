@@ -170,8 +170,10 @@ void loop()
   //   Serial.print(sensors[i]);
   //   Serial.print(" ");
   // }
+  int angle = 1;
+  drive(0-angle, angle);
 
-  auton();
+  //auton();
 
   // This is important - it sleeps for delayTime/100 seconds
   // Running the code too fast will overwhelm the microcontroller and peripherals
