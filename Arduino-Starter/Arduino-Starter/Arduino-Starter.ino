@@ -86,12 +86,18 @@ void teleopRead() {
 }
 
 void alignToBall(bool dir){
-  //Rotate left
-  if(dir==true){
-    
-  } else {
   //Rotate right
-  
+  Serial.println(RR_getUltrasonic());
+  if (RR_getUltrasonic()==0||RR_getUltrasonic()>2.5){
+    Serial.println('e');
+    if(dir==true){
+      rightX=0.0;
+      leftY=-1.0;
+    } else {
+    //Rotate left
+      leftY=1.0;
+      rightX=0.0;
+    }
   }
 }
 
@@ -129,16 +135,24 @@ void printButtons() {
 
 void loop()
 {
-  teleopRead();
+  //teleopRead();
   // read the ultrasonic sensors
-  drive(leftY+rightX,leftY-rightX);
-
-  if (btnRB) {
-    alignToBall(true);
-  } else if (btnLB) {
-    alignToBall(false);
+  //if (btnRB) {
+  //  alignToBall(true);
+  //} else if (btnLB) {
+    //alignToBall(false);
   }
+  //drive(leftY+rightX,leftY-rightX);
 
+  //int sensors[6];
+  //printUltrasonic();
+  // Serial.print("Line sensors=");
+  // RR_getLineSensors(sensors);
+  // for (int i = 0; i < 6; ++i)
+  // {
+  //   Serial.print(sensors[i]);
+  //   Serial.print(" ");
+  // }
 
   auton();
 
