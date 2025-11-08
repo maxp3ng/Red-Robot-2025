@@ -39,8 +39,8 @@ void auton()
 {
   if (btnB) {autonGo = true;}
   if (!autonGo) {return;}
-  int nSense;
-  float nSenseAv = (float)nSense/2;
+  int nSense = 6;
+  float nSenseAv = (float)(nSense-1)/2.0;
   int sensors[nSense];
   float mean;
   float sum = 0.0;
@@ -50,7 +50,7 @@ void auton()
   for (int i = 0; i < nSense; ++i)
   {
     // TODO tweak offset based weighting 
-    sum += sensors[i]*abs(nSenseAv-i);
+    sum += sensors[i]*(i-nSense);
 
     Serial.print(sensors[i]);
     Serial.print(" ");
@@ -58,18 +58,22 @@ void auton()
   mean = sum /= nSense;
 
   pos = mean/sum;
-  error = pos-lastPos;
+  error = pos-nSenseAv;
 
   // we love PID!
   p = error;
   i += error;
-  d = lastError;
+  d = error - lastError;
   
   lastPos = pos;
   lastError = error;
   //pid is a value from 0-5 ctn
-  int pid = (Kp*p + Kp*i + Kp*d);
-  autonDrive((pid-nSenseAv)/nSenseAv);
+  int pid = (Kp*p + Ki*i + Kd*d);
+  autonDrive(pid/nSenseAv);
+
+  Serial.print("Pos: "); Serial.print(pos);
+  Serial.print(" Error: "); Serial.print(error);
+  Serial.print(" PID: "); Serial.print(pid);
 }
 
 void teleopRead() {
@@ -141,8 +145,7 @@ void loop()
   //  alignToBall(true);
   //} else if (btnLB) {
     //alignToBall(false);
-  }
-  //drive(leftY+rightX,leftY-rightX);
+    //drive(leftY+rightX,leftY-rightX);
 
   //int sensors[6];
   //printUltrasonic();
