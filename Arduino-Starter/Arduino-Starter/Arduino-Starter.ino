@@ -27,10 +27,10 @@ float pos, lastPos, error, lastError;
 float p,i,d;
 
 //tweak implement gains!
-float Kp = 0.5;
+float Kp = 0.6;
 float Ki = 0;
-float Kd = 0;
-float speed = 0.5;
+float Kd = 0.3;
+float speed = 0.325;
 
 void autonDrive(float angle){
   drive(speed+angle, speed-angle);
@@ -39,7 +39,7 @@ void autonDrive(float angle){
 void auton()
 {
   if (btnB) {autonGo = true;}
-  if (!autonGo) {return;}
+  //if (!autonGo) {return;}
   int nSense = 4;
   float nSenseAv = (float)(nSense-1)/2.0;
   int sensors[nSense];
@@ -64,8 +64,8 @@ void auton()
   // we love PID!
   p = error;
 
-  if (i+error>100) {i=100;}
-  else if (i+error<-100) {i=-100;}
+  if (i+error>1) {i=1;}
+  else if (i+error<-1) {i=-1;}
   else {i += error;} 
   d = error - lastError;
   
@@ -166,7 +166,7 @@ void loop()
   //  alignToBall(true);
   //} else if (btnLB) {
     //alignToBall(false);
-    //drive(leftY+rightX,leftY-rightX);
+  //drive(leftY+rightX,leftY-rightX);
 
   //int sensors[6];
   //printUltrasonic();
